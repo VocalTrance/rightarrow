@@ -42,15 +42,22 @@ token_t* _lex(lexer_t* lexer) {
 		token_t* token = (void*)0;
 		switch (c) {
 			case '"': token = _lex_string(lexer); break;
+			case '.': 
+				if (isdigit(reader_peek_k(reader, 2))) {
+					token = _lex_number(lexer);
+				} else {
+					token = init_token(TOKEN_COLON, ".");
+				}
+				break;
 			default: {
-					// Number state
-					if (isdigit(c)) {
-						token = _lex_number(lexer);
-					} else if (isalnum(c)) {
-						token = _lex_ident(lexer);
-					} else if (reader_is_eof(reader)) {
-						token = init_token(TOKEN_EOF, "");
-					}
+				// Number state
+				if (isdigit(c)) {
+					token = _lex_number(lexer);
+				} else if (isalnum(c)) {
+					token = _lex_ident(lexer);
+				} else if (reader_is_eof(reader)) {
+					token = init_token(TOKEN_EOF, "");
+				}
 			}
 		}
 

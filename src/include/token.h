@@ -7,7 +7,8 @@ typedef struct TOKEN_STRUCT {
 		TOKEN_IDENT,
 		TOKEN_STRING_L,
 		TOKEN_INT_L,
-		TOKEN_FLOAT_L
+		TOKEN_FLOAT_L,
+		TOKEN_COLON
 	} type;
 	char* value;
 } token_t;
