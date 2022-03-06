@@ -37,7 +37,7 @@ parser_t* init_parser(lexer_t* lexer) {
 ast_t* parser_parse(parser_t* parser) {
 	ast_t* ast = init_ast();	
 
-	treenode_t* node = E(parser);
+	treenode_t* node = _parse_statement(parser);
 	treenode_print(node);
 	ast_add_statement(ast, node);
 	while (parser->cur_token->type == TOKEN_SEMI) {
