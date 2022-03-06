@@ -14,6 +14,8 @@ treenode_t* _print(visitor_t* visitor, treenode_t** args, size_t args_size) {
 		switch (arg->type) {
 			case TREENODE_NOOP: break; // Ignore function calls with no return value
 			case TREENODE_STRING: printf("%s ", arg->string_value); break;
+			case TREENODE_INT: printf("%d ", arg->int_value); break;
+			case TREENODE_FLOAT: printf("%.6f ", arg->float_value); break;
 		}
 	}
 	printf("\n");

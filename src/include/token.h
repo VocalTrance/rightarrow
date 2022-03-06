@@ -3,6 +3,7 @@
 typedef struct TOKEN_STRUCT {
 	enum {
 		TOKEN_EOF,
+		TOKEN_RA,
 		TOKEN_IDENT,
 		TOKEN_STRING_L,
 		TOKEN_INT_L,
@@ -13,6 +14,10 @@ typedef struct TOKEN_STRUCT {
 		TOKEN_COMMA,
 		TOKEN_LPAREN,
 		TOKEN_RPAREN,
+		TOKEN_PLUS,
+		TOKEN_MINUS,
+		TOKEN_MUL,
+		TOKEN_DIV,
 	} type;
 	char* value;
 	int row;

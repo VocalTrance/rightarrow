@@ -1,0 +1,7 @@
+stringVar = "someString";
+intVar = 2345;
+floatVar = 234.234;
+floatVar2 = .234;
+
+print("Hi this is me printing", intVar);
+print(floatVar, floatVar2, .12, 3.14, 314);

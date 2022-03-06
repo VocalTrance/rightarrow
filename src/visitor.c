@@ -11,6 +11,10 @@ treenode_t* _visit_variable(visitor_t* visitor, treenode_t* node);
 
 treenode_t* _visit_string(visitor_t* visitor, treenode_t* node);
 
+treenode_t* _visit_int(visitor_t* visitor, treenode_t* node);
+
+treenode_t* _visit_float(visitor_t* visitor, treenode_t* node);
+
 visitor_t* init_visitor(ast_t* ast) {
 	visitor_t* visitor = calloc(1, sizeof(visitor_t));
 	visitor->ast = ast;
@@ -34,6 +38,8 @@ treenode_t* visitor_visit_node(visitor_t* visitor, treenode_t* node) {
 		case TREENODE_FUNCTION_CALL: return _visit_function_call(visitor, node);
 		case TREENODE_VARIABLE: return _visit_variable(visitor, node);
 		case TREENODE_STRING: return _visit_string(visitor, node);
+		case TREENODE_INT: return _visit_int(visitor, node);
+		case TREENODE_FLOAT: return _visit_float(visitor, node);
 	}
 	return init_treenode_noop(-1, -1);
 }
@@ -42,7 +48,7 @@ treenode_t* _visit_function_call(visitor_t* visitor, treenode_t* node) {
 	if (builtin_function_exists(node->function_name)) {
 		return builtin_call_function(visitor, node);
 	} else {
-	printf("(%d, %d): No function with name %s\n", node->row, node->col, node->function_name);
+		printf("(%d, %d): No function with name %s\n", node->row, node->col, node->function_name);
 		exit(1);
 	}
 }
@@ -55,6 +61,14 @@ treenode_t* _visit_variable_def(visitor_t* visitor, treenode_t* node) {
 			visitor->variables, 
 			(visitor->variable_count + 1) * sizeof(treenode_t*)
 		);
+	}
+
+	// If redefinition	
+	for (int i = 0; i < visitor->variable_count; i++) {
+		if (strcmp(visitor->variables[i]->left->variable_name, node->left->variable_name) == 0) {
+			visitor->variables[i] = node;
+			return node;
+		}
 	}
 
 	visitor->variables[visitor->variable_count] = node;
@@ -75,5 +89,13 @@ treenode_t* _visit_variable(visitor_t* visitor, treenode_t* node) {
 }
 
 treenode_t* _visit_string(visitor_t* visitor, treenode_t* node) {
+	return node;
+}
+
+treenode_t* _visit_int(visitor_t* visitor, treenode_t* node) {
+	return node;
+}
+
+treenode_t* _visit_float(visitor_t* visitor, treenode_t* node) {
 	return node;
 }

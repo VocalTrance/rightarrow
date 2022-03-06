@@ -8,8 +8,17 @@ char* treenode_to_str(treenode_t* node) {
 	switch (node->type) {
 		case TREENODE_NOOP: return "TREENODE_NOOP";
 		case TREENODE_VARIABLE: sprintf(buffer, "TREENODE_VARIABLE: %s", node->variable_name); break;
-		case TREENODE_VARIABLE_DEF: sprintf(buffer, "TREENODE_VARIABLE_DEF: %s = %s", node->left->variable_name, node->right->string_value); break;
+		case TREENODE_VARIABLE_DEF: 
+				switch (node->right->type) {
+					case TREENODE_STRING: sprintf(buffer, "TREENODE_VARIABLE_DEF: %s = %s", node->left->variable_name, node->right->string_value); break;
+					case TREENODE_INT: sprintf(buffer, "TREENODE_VARIABLE_DEF: %s = %d", node->left->variable_name, node->right->int_value); break;
+					case TREENODE_FLOAT: sprintf(buffer, "TREENODE_VARIABLE_DEF: %s = %.6f", node->left->variable_name, node->right->float_value); break;
+					case TREENODE_FUNCTION_CALL: sprintf(buffer, "TREENODE_VARIABLE_DEF: %s = %s", node->left->variable_name, node->right->function_name); break;
+				}
+				break;
 		case TREENODE_STRING: sprintf(buffer, "TREENODE_STRING: %s", node->string_value); break;
+		case TREENODE_INT: sprintf(buffer, "TREENODE_INT: %d", node->int_value); break;
+		case TREENODE_FLOAT: sprintf(buffer, "TREENODE_FLOAT: %.6f", node->float_value); break;
 		case TREENODE_FUNCTION_CALL: sprintf(buffer, "TREENODE_FUNCTION_CALL: %s() %d arguments", node->function_name, node->child_count);
 	}
 	//char* args = calloc(2, sizeof(char));
@@ -43,6 +52,8 @@ treenode_t* _init_empty(int row, int col) {
 	node->variable_name = (void*)0;
 	node->function_name = (void*)0;
 	node->string_value = (void*)0;
+	node->int_value = 0;
+	node->float_value = 0.0f;
 	return node;
 }
 
@@ -66,6 +77,19 @@ treenode_t* init_treenode_string(char* name, int row, int col) {
 	return node;
 }
 
+treenode_t* init_treenode_int(int value, int row, int col) {
+	treenode_t* node = _init_empty(row, col);
+	node->type = TREENODE_INT;
+	node->int_value = value;
+	return node;
+}
+
+treenode_t* init_treenode_float(float value, int row, int col) {
+	treenode_t* node = _init_empty(row, col);
+	node->type = TREENODE_FLOAT;
+	node->float_value = value;
+	return node;
+}
 treenode_t* init_treenode_variable_def(treenode_t* left, treenode_t* right, int row, int col) {
 	treenode_t* node = _init_empty(row, col);
 	node->type = TREENODE_VARIABLE_DEF;
@@ -80,5 +104,13 @@ treenode_t* init_treenode_function_call(char* name, treenode_t** args, size_t ar
 	node->function_name = name;
 	node->children = args;
 	node->child_count = args_size;
+	return node;
+}
+
+treenode_t* init_treenode_arithmetic(int type, treenode_t* left, treenode_t* right, int row, int col) {
+	treenode_t* node = _init_empty(row, col);
+	node->type = type;
+	node->left = left;
+	node->right = right;
 	return node;
 }

@@ -14,7 +14,23 @@ reader_t* init_reader_from_string(char* contents) {
 	reader->col = 1;
 }
 
-reader_t* init_reader_from_file(FILE* f) {
+reader_t* init_reader_from_file(char* filepath) {
+	FILE* f = fopen(filepath, "rb");
+	if (f) {
+		char* buffer = 0;
+		fseek(f, 0, SEEK_END);
+		long length = ftell(f);
+		fseek(f, 0, SEEK_SET);
+		buffer = calloc(length, sizeof(char));
+
+		if (buffer) {
+			fread(buffer, 1, length, f);
+		}
+		fclose(f);
+		return init_reader_from_string(buffer);
+	}
+	printf("Error reading from file %s\n", filepath);
+	exit(1);
 }
 
 char reader_current_char(reader_t* reader) {

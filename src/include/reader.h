@@ -16,7 +16,7 @@ typedef struct READER_STRUCT {
 
 reader_t* init_reader_from_string(char* contents);
 
-reader_t* init_reader_from_file(FILE* f);
+reader_t* init_reader_from_file(char* filepath);
 
 char reader_current_char(reader_t* reader);
 

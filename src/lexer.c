@@ -13,6 +13,8 @@ token_t* _lex_ident(lexer_t* lexer);
 
 token_t* _lex_number(lexer_t* lexer);
 
+token_t* _lex_rightarrow(lexer_t* lexer);
+
 token_t* _lex(lexer_t* lexer) {
 	reader_t* reader = lexer->reader;
 	if (!reader_is_eof(reader)) {
@@ -36,13 +38,28 @@ token_t* _lex(lexer_t* lexer) {
 			case ',': token = init_token(TOKEN_COMMA, ",", reader->row, reader->col); reader_consume(reader); break;
 			case '(': token = init_token(TOKEN_LPAREN, "(", reader->row, reader->col); reader_consume(reader); break;
 			case ')': token = init_token(TOKEN_RPAREN, ")", reader->row, reader->col); reader_consume(reader); break;
+			case '+': token = init_token(TOKEN_PLUS, "+", reader->row, reader->col); reader_consume(reader); break;
+			case '*': token = init_token(TOKEN_MUL, "*", reader->row, reader->col); reader_consume(reader); break;
+			case '/': token = init_token(TOKEN_DIV, "/", reader->row, reader->col); reader_consume(reader); break;
+
 			case '.': 
-				if (isdigit(reader_peek_k(reader, 2))) {
+				if (isdigit(reader_peek(reader))) {
 					token = _lex_number(lexer);
 				} else {
 					token = init_token(TOKEN_COLON, ".", reader->row, reader->col);
+					reader_consume(reader);
 				}
 				break;
+
+			case '-':
+				if (reader_peek(reader) == '>') {
+					token = _lex_rightarrow(lexer);
+				} else {
+					token = init_token(TOKEN_MINUS, "-", reader->row, reader->col);
+					reader_consume(reader);
+				}
+				break;
+
 			default: {
 				// Number state
 				if (isdigit(c)) {
@@ -88,7 +105,8 @@ token_t* _lex_string(lexer_t* lexer) {
 	}
 
 	if (reader_is_eof(reader)) {
-		// Unclosed string literal
+		printf("Unclosed string literal `%s` at (%d, %d)\n", string, row, col);
+		exit(1);
 	} else {
 		reader_consume(reader); // Consume closing '"'
 	}
@@ -120,9 +138,9 @@ token_t* _lex_number(lexer_t* lexer) {
 
 	int colon_found = 0;
 	char* string = calloc(1, sizeof(char));
-	char c = reader_peek(reader);
+	char c = reader_current_char(reader);
 	while ((isdigit(c) || 
-			 	(c == '.' && isdigit(reader_peek_k(reader, 2)) && colon_found < 1
+			 	(c == '.' && isdigit(reader_peek(reader)) && colon_found < 1
 				)) && !reader_is_eof(reader))
 	{
 		reader_consume(reader);
@@ -132,7 +150,7 @@ token_t* _lex_number(lexer_t* lexer) {
 		if (c == '.') {
 			colon_found += 1;
 		}
-		c = reader_peek(reader);
+		c = reader_current_char(reader);
 	}
 
 	if (!colon_found) {
@@ -140,6 +158,13 @@ token_t* _lex_number(lexer_t* lexer) {
 	} else {
 		return init_token(TOKEN_FLOAT_L, string, row, col);	
 	}
+}
+
+token_t* _lex_rightarrow(lexer_t* lexer) {
+	token_t* token = init_token(TOKEN_RA, "->", lexer->reader->row, lexer->reader->col);
+	reader_consume(lexer->reader); // -
+	reader_consume(lexer->reader); // >
+	return token;	
 }
 
 lexer_t* init_lexer(reader_t* reader) {
