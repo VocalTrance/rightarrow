@@ -1,5 +1,5 @@
-exec = hello
-objects = reader.o main.o lexer.o token.o 
+exec = ra
+objects = reader.o main.o lexer.o token.o ast.o treenode.o parser.o visitor.o builtin.o
 sources = $(wildcard src/*.c) 
 headers = $(wildcard src/include/*.h)
 flags = -g
@@ -13,7 +13,3 @@ $(objects): $(sources) $(headers)
 clean: 
 	-rm $(objects)
 	-rm $(exec).out
-
-test:
-	echo $(sources)
-	echo $(objects)

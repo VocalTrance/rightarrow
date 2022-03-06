@@ -2,17 +2,20 @@
 #include "include/reader.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "include/parser.h"
+#include "include/visitor.h"
 
 
 int main(int argc, char* argv[]) {
-	char* src = "int xd \"MySTRINGERO\" int x 12 int y 234.234 int xy 23.33.33   ";
+	char* src = "honey= \"Honeeeey\";"
+							"print(honey, \"Ok\")\n;"
+							"print(\"hm...ok\");";
+
 	reader_t* reader = init_reader_from_string(src);
 	lexer_t* lexer = init_lexer(reader);
-	token_t* tok = lexer_next_token(lexer);
-	printf("Token (%d, %s)\n", tok->type, tok->value);
-	while (tok->type != TOKEN_EOF) {
-		tok = lexer_next_token(lexer);
-		printf("Token (%d, %s)\n", tok->type, tok->value);
-	}
+	parser_t* parser = init_parser(lexer);
+	ast_t* ast = parser_parse(parser);
+	visitor_t* visitor = init_visitor(ast);
+	visitor_visit(visitor);
 	return 0;
 }
